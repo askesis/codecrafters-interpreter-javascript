@@ -23,6 +23,8 @@ if (fileContent.length !== 0) {
     switch (c) {
       case '(': console.log('LEFT_PAREN ( null'); break;
       case ')': console.log('RIGHT_PAREN ) null'); break;
+      case '{': console.log('LEFT_BRACE { null'); break;
+      case '}': console.log('RIGHT_BRACE } null'); break;
     
       default:
         break;
