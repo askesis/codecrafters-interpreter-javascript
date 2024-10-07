@@ -19,7 +19,15 @@ const filename = args[1];
 const fileContent = fs.readFileSync(filename, "utf8");
 
 if (fileContent.length !== 0) {
-  throw new Error("Scanner not implemented");
-} else {
-  console.log("EOF  null");
+  for (const c of fileContent) {
+    switch (c) {
+      case '(': console.log('LEFT_PAREN ( null'); break;
+      case ')': console.log('RIGHT_PAREN ) null'); break;
+    
+      default:
+        break;
+    }
+  }
 }
+
+console.log("EOF  null");
