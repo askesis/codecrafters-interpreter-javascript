@@ -52,10 +52,6 @@ function printToken(type, literal) {
   console.log(`${type} ${lexeme} ${literal}`);
 }
 
-function extractCommentLine(line) {
-
-}
-
 if (fileContent.length > 0) {
   const lines = fileContent.split('\n');
 
@@ -101,6 +97,12 @@ if (fileContent.length > 0) {
           } else {
             printToken('SLASH', null );
           }
+          break;
+        }
+        case ' ': 
+        case '  ': 
+        case '\r':
+        case '\t': {
           break;
         }
 
