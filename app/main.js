@@ -41,6 +41,8 @@ function mapTypeToLexeme(type) {
     case 'LESS': return '<';
     case 'GREATER_EQUAL': return '>=';
     case 'GREATER': return '>';
+
+    case 'SLASH': return '/';
   }
 }
 
@@ -50,6 +52,10 @@ function printToken(type, literal) {
   console.log(`${type} ${lexeme} ${literal}`);
 }
 
+function extractCommentLine(line) {
+
+}
+
 if (fileContent.length > 0) {
   const lines = fileContent.split('\n');
 
@@ -57,7 +63,6 @@ if (fileContent.length > 0) {
     const line = lines[rowIndex];
 
     for (let i = 0; i < line.length; i++) {
-
       switch (line[i]) {
         case '(': printToken('LEFT_PAREN', null); break;
         case ')': printToken('RIGHT_PAREN', null); break;
@@ -88,6 +93,14 @@ if (fileContent.length > 0) {
         case '>': {
           printToken(line[i+1] == '=' ? 'GREATER_EQUAL': 'GREATER', null );
           if (line[i+1] === '=') i++;
+          break;
+        }
+        case '/': {
+          if (line[i+1] == '/') { // comments detected, don't add any token
+            i = line.length;
+          } else {
+            printToken('SLASH', null );
+          }
           break;
         }
 
