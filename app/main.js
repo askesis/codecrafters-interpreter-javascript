@@ -20,28 +20,80 @@ const fileContent = fs.readFileSync(filename, "utf8");
 
 let isUnexpectedCharacterSeen = false;
 
+function mapTypeToLexeme(type) {
+  switch (type) {
+    case 'LEFT_PAREN': return '(';
+    case 'RIGHT_PAREN': return ')';
+    case 'LEFT_BRACE': return '{';
+    case 'RIGHT_BRACE': return '}';
+    case 'COMMA': return ',';
+    case 'DOT': return '.';
+    case 'SEMICOLON': return ';';
+    case 'PLUS': return '+';
+    case 'MINUS': return '-';
+    case 'STAR': return '*';
+
+    case 'BANG': return '!';
+    case 'BANG_EQUAL': return '!=';
+    case 'EQUAL_EQUAL': return '==';
+    case 'EQUAL': return '=';
+    case 'LESS_EQUAL': return '<=';
+    case 'LESS': return '<';
+    case 'GREATER_EQUAL': return '>=';
+    case 'GREATER': return '>';
+  }
+}
+
+function printToken(type, literal) {
+  const lexeme = mapTypeToLexeme(type);
+
+  console.log(`${type} ${lexeme} ${literal}`);
+}
+
 if (fileContent.length > 0) {
   const lines = fileContent.split('\n');
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+  for (let rowIndex = 0; rowIndex < lines.length; rowIndex++) {
+    const line = lines[rowIndex];
 
-    for (const c of line) {
-      switch (c) {
-        case '(': console.log('LEFT_PAREN ( null'); break;
-        case ')': console.log('RIGHT_PAREN ) null'); break;
-        case '{': console.log('LEFT_BRACE { null'); break;
-        case '}': console.log('RIGHT_BRACE } null'); break;
-        case ',': console.log('COMMA , null'); break;
-        case '.': console.log('DOT . null'); break;
-        case ';': console.log('SEMICOLON ; null'); break;
-        case '+': console.log('PLUS + null'); break;
-        case '-': console.log('MINUS - null'); break;
-        case '*': console.log('STAR * null'); break;
+    for (let i = 0; i < line.length; i++) {
+
+      switch (line[i]) {
+        case '(': printToken('LEFT_PAREN', null); break;
+        case ')': printToken('RIGHT_PAREN', null); break;
+        case '{': printToken('LEFT_BRACE', null); break;
+        case '}': printToken('RIGHT_BRACE', null); break;
+        case ',': printToken('COMMA', null); break;
+        case '.': printToken('DOT', null); break;
+        case ';': printToken('SEMICOLON', null); break;
+        case '+': printToken('PLUS', null); break;
+        case '-': printToken('MINUS', null); break;
+        case '*': printToken('STAR', null); break;
+
+        case '!': {
+          printToken(line[i+1] == '=' ? 'BANG_EQUAL': 'BANG', null );
+          if (line[i+1] === '=') i++;
+          break;
+        }
+        case '=': {
+          printToken(line[i+1] == '=' ? 'EQUAL_EQUAL': 'EQUAL', null );
+          if (line[i+1] === '=') i++;
+          break;
+        }
+        case '<': {
+          printToken(line[i+1] == '=' ? 'LESS_EQUAL': 'LESS', null );
+          if (line[i+1] === '=') i++;
+          break;
+        }
+        case '>': {
+          printToken(line[i+1] == '=' ? 'GREATER_EQUAL': 'GREATER', null );
+          if (line[i+1] === '=') i++;
+          break;
+        }
 
         default: {
           isUnexpectedCharacterSeen = true;
-          console.error(`[line ${i + 1}] Error: Unexpected character: ${c}`);
+          console.error(`[line ${rowIndex + 1}] Error: Unexpected character: ${line[i]}`);
           break;
         }
       }
