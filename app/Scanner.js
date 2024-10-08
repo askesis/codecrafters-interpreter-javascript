@@ -1,6 +1,6 @@
 import Lox from "./Lox.js";
 import Token from "./Token.js";
-import { EOF, LEFT_BRACE, LEFT_PAREN, RIGHT_BRACE, COMMA, DOT, MINUS, PLUS, SEMICOLON, STAR, SLASH, STRING, EQUAL_EQUAL, EQUAL, BANG, BANG_EQUAL, LESS_EQUAL, LESS, GREATER, GREATER_EQUAL, RIGHT_PAREN, NUMBER } from "./TokenType.js";
+import { EOF, LEFT_BRACE, LEFT_PAREN, RIGHT_BRACE, COMMA, DOT, MINUS, PLUS, SEMICOLON, STAR, SLASH, STRING, EQUAL_EQUAL, EQUAL, BANG, BANG_EQUAL, LESS_EQUAL, LESS, GREATER, GREATER_EQUAL, RIGHT_PAREN, NUMBER, IDENTIFIER, AND, CLASS, ELSE, FALSE, FOR, FUN, IF, NIL, OR, PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE } from "./TokenType.js";
 
 class Scanner {
   tokens = [];
@@ -10,6 +10,25 @@ class Scanner {
 
   constructor(source) {
     this.source = source;
+  }
+
+  static keywords = {
+    "and":    AND,
+    "class":  CLASS,
+    "else":   ELSE,
+    "false":  FALSE,
+    "for":    FOR,
+    "fun":    FUN,
+    "if":     IF,
+    "nil":    NIL,
+    "or":     OR,
+    "print":  PRINT,
+    "return": RETURN,
+    "super":  SUPER,
+    "this":   THIS,
+    "true":   TRUE,
+    "var":    VAR,
+    "while":  WHILE,
   }
 
   scanTokens() {
@@ -73,11 +92,24 @@ class Scanner {
       default: {
         if (this.isDigit(c)) {
           this.number();
+        } else if (this.isAlpha(c)) { 
+          this.identifier() 
         } else {
           Lox.error(this.line, `Unexpected character: ${c}`)
         }
       }
     }
+  }
+
+  identifier() {
+    while (this.isAlphaNumeric(this.peek())) this.advance();
+
+    const text = this.source.slice(this.start, this.current);
+    let type = Scanner.keywords[text];
+
+    if (type == undefined) type = IDENTIFIER
+
+    this.addToken(type);
   }
 
   number() {
@@ -140,6 +172,16 @@ class Scanner {
 
     return this.source.charAt(this.current + 1);
   } 
+
+  isAlpha(c) {
+    return (c >= 'a' && c <= 'z') ||
+      (c >= 'A' && c <= 'Z') || 
+      c == '_';
+  }
+
+  isAlphaNumeric(c) {
+    return this.isAlpha(c) || this.isDigit(c);
+  }
 
   isDigit(c) {
     return c >= '0' && c <= '9';
