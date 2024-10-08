@@ -1,6 +1,6 @@
 import Lox from "./Lox.js";
 import Token from "./Token.js";
-import { EOF, LEFT_BRACE, LEFT_PAREN, RIGHT_BRACE, COMMA, DOT, MINUS, PLUS, SEMICOLON, STAR, SLASH, STRING, EQUAL_EQUAL, EQUAL, BANG, BANG_EQUAL, LESS_EQUAL, LESS, GREATER, GREATER_EQUAL, RIGHT_PAREN } from "./TokenType.js";
+import { EOF, LEFT_BRACE, LEFT_PAREN, RIGHT_BRACE, COMMA, DOT, MINUS, PLUS, SEMICOLON, STAR, SLASH, STRING, EQUAL_EQUAL, EQUAL, BANG, BANG_EQUAL, LESS_EQUAL, LESS, GREATER, GREATER_EQUAL, RIGHT_PAREN, NUMBER } from "./TokenType.js";
 
 class Scanner {
   tokens = [];
@@ -71,9 +71,27 @@ class Scanner {
       case '"': this.string(); break;
 
       default: {
-        Lox.error(this.line, `Unexpected character: ${c}`)
+        if (this.isDigit(c)) {
+          this.number();
+        } else {
+          Lox.error(this.line, `Unexpected character: ${c}`)
+        }
       }
     }
+  }
+
+  number() {
+    while (this.isDigit(this.peek())) this.advance();
+
+    if (this.peek() == '.' && this.isDigit(this.peekNext())) {
+      this.advance();
+
+      while (this.isDigit(this.peek())) this.advance();
+    }
+
+    const num = parseFloat(this.source.slice(this.start, this.current));
+
+    this.addToken(NUMBER, Number.isInteger(num) ? num.toFixed(1) : num);
   }
 
   string() {
@@ -115,6 +133,16 @@ class Scanner {
     }
 
     return this.source.charAt(this.current);
+  }
+
+  peekNext() {
+    if (this.current + 1 >= this.source.length) return '\0';
+
+    return this.source.charAt(this.current + 1);
+  } 
+
+  isDigit(c) {
+    return c >= '0' && c <= '9';
   }
 
   isAtEnd() {
